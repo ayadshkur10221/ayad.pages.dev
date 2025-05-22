@@ -61,6 +61,56 @@ const isAuthenticated = (req, res, next) => {
 // ...existing code from app.js...
 
 // Routes
+app.get('/', async (req, res) => {
+    try {
+        // Fetch the list of music files from Cloudflare R2
+        const params = {
+            Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME,
+            Prefix: 'music/',
+        };
+
+        const data = await r2Client.send(new ListObjectsV2Command(params));
+        // Try to match files with titles from musicSettings.files
+        const musicFiles = (data.Contents || []).map(file => {
+            const url = `https://pub-3cf28645129b480fa630d3772e9352fe.r2.dev/${file.Key}`;
+            const found = (musicSettings.files || []).find(f => f.url === url);
+            return {
+                key: file.Key,
+                url,
+                title: found ? found.title : file.Key.split('/').pop(),
+                artist: found ? found.artist : 'Unknown Artist',
+            };
+        });
+
+        // Randomly select a starting music file
+        const randomIndex = Math.floor(Math.random() * musicFiles.length);
+        const selectedMusic = musicFiles[randomIndex];
+
+        res.render('index', {
+            title: process.env.SITE_TITLE || '',
+            background: backgroundSettings,
+            music: {
+                files: musicFiles,
+                selected: selectedMusic,
+                autoplay: musicSettings.autoplay,
+                showPlayer: musicSettings.showPlayer
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching music files:', error);
+        res.render('index', {
+            title: process.env.SITE_TITLE || '',
+            background: backgroundSettings,
+            music: {
+                files: [],
+                selected: null,
+                autoplay: musicSettings.autoplay,
+                showPlayer: musicSettings.showPlayer
+            }
+        });
+    }
+});
+
 // ...existing code from app.js...
 
 // Helper functions
