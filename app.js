@@ -429,3 +429,6 @@ loadSettings();
 const serverless = require('serverless-http');
 module.exports = app;
 module.exports.handler = serverless(app);
+
+// This file is now deprecated. All logic has been moved to api/index.js for Vercel compatibility.
+// Please use api/index.js as your entry point for serverless deployment.
