@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <style>
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .card-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+                <div class="flex gap-2">
+                    <a href="/admin/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Logout
+                    </a>
+                    <a href="/" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Visit Page
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-container">
+
+                <!-- Background Settings Form -->
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="card-content">
+                        <h2 class="text-xl font-semibold mb-4">Background Settings</h2>
+                        <form id="uploadVideoForm" enctype="multipart/form-data" method="POST" action="/api/upload-video">
+                            <input type="file" name="file" accept="video/*" required class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Upload Video
+                            </button>
+                        </form>
+                        <form action="/admin/update-background" method="POST" class="space-y-4 mt-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">
+                                    Blur Effect
+                                </label>
+                                <input 
+                                    type="range" 
+                                    name="blur"
+                                    min="0" 
+                                    max="20"
+                                    value="<%= background.blur %>"
+                                    class="w-full"
+                                >
+                                <div class="text-sm text-gray-500">Current: <%= background.blur %>px</div>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Update Blur
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="text-xl font-semibold mb-4">Select Video</h2>
+                        <div id="video-list" class="space-y-2">
+                            <!-- Video files will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music Settings Form -->
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="card-content">
+                        <h2 class="text-xl font-semibold mb-4">Music Settings</h2>
+                        <form action="/admin/update-music" method="POST" class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <label class="block text-gray-700 text-sm font-bold">
+                                    <input type="checkbox" name="autoplay" <%= music.autoplay ? 'checked' : '' %> class="mr-2">
+                                    Enable Autoplay
+                                </label>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <label class="block text-gray-700 text-sm font-bold">
+                                    <input type="checkbox" name="showPlayer" <%= music.showPlayer ? 'checked' : '' %> class="mr-2">
+                                    Display Media Player
+                                </label>
+                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Update Music Settings
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="text-xl font-semibold mb-4">Upload Music</h2>
+                        <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/api/upload-music">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="musicTitle">
+                                Title
+                            </label>
+                            <input type="text" name="title" id="musicTitle" required placeholder="Enter music title" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="musicArtist">
+                                Artist
+                            </label>
+                            <input type="text" name="artist" id="musicArtist" required placeholder="Enter artist name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                            <input type="file" name="file" accept="audio/*" required class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Upload Music
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Select Music Section -->
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="card-content">
+                        <h2 class="text-xl font-semibold mb-4">Select Music</h2>
+                        <div id="music-list" class="space-y-2">
+                            <!-- Music files will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const musicList = document.getElementById('music-list');
+            const mediaPlayer = document.getElementById('media-player');
+            const audioPlayer = document.getElementById('audio-player');
+
+            try {
+                const response = await fetch('/api/list-music');
+                const files = await response.json();
+
+                if (files.length === 0) {
+                    musicList.innerHTML = '<p class="text-gray-500">No music files uploaded yet.</p>';
+                    return;
+                }
+
+                files.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center space-x-4';
+
+                    const link = document.createElement('a');
+                    link.href = file.url;
+                    link.target = '_blank';
+                    link.textContent = file.key.split('/').pop();
+                    link.className = 'text-blue-500 hover:underline';
+
+                    const button = document.createElement('button');
+                    button.textContent = 'Select';
+                    button.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded';
+                    button.addEventListener('click', async () => {
+                        try {
+                            const response = await fetch('/api/set-selected-music', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ url: file.url }),
+                            });
+
+                            if (response.ok) {
+                                alert('Music file selected successfully!');
+                            } else {
+                                alert('Failed to select music file.');
+                            }
+                        } catch (error) {
+                            console.error('Error selecting music file:', error);
+                            alert('An error occurred while selecting the music file.');
+                        }
+                    });
+
+                    item.appendChild(link);
+                    item.appendChild(button);
+                    musicList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error fetching music files:', error);
+                musicList.innerHTML = '<p class="text-red-500">Failed to load music files.</p>';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const videoList = document.getElementById('video-list');
+
+            try {
+                const response = await fetch('/api/list-videos');
+                const files = await response.json();
+
+                if (files.length === 0) {
+                    videoList.innerHTML = '<p class="text-gray-500">No video files uploaded yet.</p>';
+                    return;
+                }
+
+                files.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center space-x-4';
+
+                    const link = document.createElement('a');
+                    link.href = file.url;
+                    link.target = '_blank';
+                    link.textContent = file.key.split('/').pop();
+                    link.className = 'text-blue-500 hover:underline';
+
+                    const button = document.createElement('button');
+                    button.textContent = 'Select';
+                    button.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded';
+                    button.addEventListener('click', async () => {
+                        try {
+                            const response = await fetch('/api/set-selected-video', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ url: file.url }),
+                        });
+
+                        if (response.ok) {
+                            alert('Video file selected successfully!');
+                        } else {
+                            alert('Failed to select video file.');
+                        }
+                    } catch (error) {
+                        console.error('Error selecting video file:', error);
+                        alert('An error occurred while selecting the video file.');
+                    }
+                });
+
+                item.appendChild(link);
+                item.appendChild(button);
+                videoList.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Error fetching video files:', error);
+            videoList.innerHTML = '<p class="text-red-500">Failed to load video files.</p>';
+        }
+    });
+    </script>
+</body>
+</html>
