@@ -391,5 +391,18 @@ loadSettings();
 const staticRouter = require('./static');
 app.use('/api/static', staticRouter);
 
+// Serve static CSS files
+app.get('/css/:file', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/css', req.params.file));
+});
+// Serve static JS files
+app.get('/scripts/:file', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/scripts', req.params.file));
+});
+// Serve static image files
+app.get('/images/:file', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/images', req.params.file));
+});
+
 module.exports = app;
 module.exports.handler = serverless(app);
