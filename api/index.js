@@ -387,7 +387,9 @@ function loadSettings() {
 
 loadSettings();
 
-module.exports.handler = serverless(app);
-module.exports = app;
+// Static file routes
+const staticRouter = require('./static');
 app.use('/api/static', staticRouter);
-const staticRouter = require('./static');// Static file routes
+
+module.exports = app;
+module.exports.handler = serverless(app);
