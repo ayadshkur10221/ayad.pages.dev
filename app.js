@@ -419,8 +419,13 @@ function saveSettings() {
 // Load settings on server start
 loadSettings();
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Remove the server listen block for Vercel
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+// });
+
+// Add serverless-http export for Vercel
+const serverless = require('serverless-http');
+module.exports = app;
+module.exports.handler = serverless(app);
