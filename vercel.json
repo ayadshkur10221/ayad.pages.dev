@@ -8,24 +8,20 @@
     ],
     "routes": [
         {
-            "src": "/public/(.*)",
-            "dest": "/public/$1"
-        },
-        {
             "src": "/css/(.*)",
-            "dest": "/public/css/$1"
+            "dest": "/api/static/css/$1"
         },
         {
             "src": "/images/(.*)",
-            "dest": "/public/images/$1"
+            "dest": "/api/static/images/$1"
         },
         {
             "src": "/scripts/(.*)",
-            "dest": "/public/scripts/$1"
+            "dest": "/api/static/scripts/$1"
         },
         {
             "src": "/(.*)",
-            "dest": "api/index.js"
+            "dest": "/api/index.js"
         }
     ]
 }

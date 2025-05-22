@@ -137,5 +137,9 @@ function saveSettings() {
 
 loadSettings();
 
+// Static file routes
+const staticRouter = require('./static');
+app.use('/api/static', staticRouter);
+
 module.exports = app;
 module.exports.handler = serverless(app);
