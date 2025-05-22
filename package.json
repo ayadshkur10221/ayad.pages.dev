@@ -1,0 +1,35 @@
+{
+  "name": "ayad",
+  "version": "1.0.0",
+  "main": "app.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build:css": "npx tailwindcss -i ./public/css/style.css -o ./public/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.815.0",
+    "@supabase/supabase-js": "^2.49.8",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.1",
+    "express-session": "^1.18.1",
+    "multer": "^2.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "nodemon": "^3.1.10",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17"
+  }
+}
